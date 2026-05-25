@@ -601,8 +601,8 @@ useEffect(() => {
         <div style={{ color: "#C0392B", fontSize: "1.1rem" }}>LoveSushi</div>
         <div style={{ color: "#aaa", fontSize: "0.8rem" }}>加载中... / Caricamento...</div>
       </div>
-    );
-  }
+      );
+      }
 
   return (
     <>
@@ -625,5 +625,4 @@ useEffect(() => {
       }
     </>
   );
-}
 }
