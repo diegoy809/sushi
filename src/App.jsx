@@ -1,4 +1,4 @@
-mport { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 
 // ── 持久化存储工具 ──────────────────────────────────────
 const STORE_KEY = "lovesushi-menu-data";
