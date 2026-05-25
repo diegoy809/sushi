@@ -106,7 +106,7 @@ function MenuView({ menu, lang, setLang, shopInfo, onLogoTap }) {
         </div>
       </div>
 
-      {/* Lang toggle */}
+          {/* Lang toggle */}
       <div style={{ background: "#C0392B", display: "flex", justifyContent: "center" }}>
         {["zh", "it"].map(l => (
           <button key={l} onClick={() => setLang(l)} style={{
@@ -135,7 +135,7 @@ function MenuView({ menu, lang, setLang, shopInfo, onLogoTap }) {
       </div>
 
       {/* Section title */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px 10px", borderBottom: "1px solid #e8ddd5", margin: "0 16px", fontFamily: "'Playfair Display', serif", fontSize: "1.05rem", color: "#C0392B}}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px 10px", borderBottom: "1px solid #e8ddd5", margin: "0 16px", fontFamily: "'Playfair Display', serif", fontSize: "1.05rem", color: "#C0392B" }}>
         <div style={{ width: 4, height: 18, background: "#C9A84C", borderRadius: 2 }} />
         {lang === "zh" ? CATEGORIES.find(c => c.id === activeCat)?.zh : CATEGORIES.find(c => c.id === activeCat)?.it}
       </div>
@@ -181,6 +181,8 @@ function MenuView({ menu, lang, setLang, shopInfo, onLogoTap }) {
                   <div style={{ display: "flex", gap: 6 }}>
                     {isSoldout && <div style={{ fontSize: "0.65rem", padding: "3px 8px", borderRadius: 999, background: "#fff3e0", color: "#e65100", fontWeight: 600 }}>{lang === "zh" ? "售罄" : "Esaurito"}</div>}
                     {badgeLabel && badgeIdx > 0 && !isSoldout && (
+                      <div style={{ fontSize: "0.65rem", padding: "3px 8px", borderRadius: 999, background: "#fff3e0", color: "#e65100", fontWeight: 600 }}>{lang === "zh" ? "售罄" : "Esaurito"}</div>}
+                    {badgeLabel && badgeIdx > 0 && !isSoldout && (
                       <div style={{ fontSize: "0.65rem", padding: "3px 8px", borderRadius: 999, background: item.badge === "novità" ? "#fff8e1" : "#f8eaea", color: item.badge === "novità" ? "#b8860b" : "#C0392B" }}>{badgeLabel}</div>
                     )}
                   </div>
@@ -189,6 +191,7 @@ function MenuView({ menu, lang, setLang, shopInfo, onLogoTap }) {
             </div>
           );
         })}
+
       </div>
 
       {/* Footer */}
