@@ -4,6 +4,13 @@ import { useState, useEffect, useRef } from "react";
 const STORE_KEY = "lovesushi-menu-data";
 const SHOP_ID_KEY = "lovesushi-shop-id";
 
+function safeGet(key) {
+  try { return localStorage.getItem(key); } catch { return null; }
+}
+function safeSet(key, val) {
+  try { localStorage.setItem(key, val); } catch {}
+}
+
 function generateShopId() {
   return "ls-" + Math.random().toString(36).slice(2, 10);
 }
@@ -57,31 +64,39 @@ const CATEGORIES = [
 const BADGES_IT = ["", "popolare", "novità", "speciale", "consigliato", "pranzo"];
 const BADGES_ZH = ["", "热销",    "新品",   "招牌",     "推荐",         "午餐"];
 
-// ── QR CODE (inline SVG via qrcode library from CDN) ────
+// ── 动态加载QR库 ────────────────────────────────────────
+function loadQRScript() {
+  return new Promise((resolve) => {
+    if (window.QRCode) return resolve();
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+    s.onload = resolve;
+    s.onerror = resolve; // 失败也继续，不卡住
+    document.head.appendChild(s);
+  });
+}
+
+// ── QR CODE ─────────────────────────────────────────────
 function QRDisplay({ shopId }) {
   const ref = useRef(null);
   const menuUrl = `${window.location.origin}${window.location.pathname}?shop=${shopId}&view=menu`;
 
   useEffect(() => {
-    if (!ref.current) return;
-    ref.current.innerHTML = "";
-    // use qrcode-svg approach via canvas
-    const size = 180;
-    const canvas = document.createElement("canvas");
-    canvas.width = size; canvas.height = size;
-    ref.current.appendChild(canvas);
-
-    // Simple QR using qrcodejs loaded from CDN script tag
-    if (window.QRCode) {
+    loadQRScript().then(() => {
+      if (!ref.current) return;
       ref.current.innerHTML = "";
-      new window.QRCode(ref.current, {
-        text: menuUrl,
-        width: size, height: size,
-        colorDark: "#1a1008",
-        colorLight: "#FAF6F0",
-        correctLevel: window.QRCode.CorrectLevel.M,
-      });
-    }
+      if (window.QRCode) {
+        new window.QRCode(ref.current, {
+          text: menuUrl,
+          width: 180, height: 180,
+          colorDark: "#1a1008",
+          colorLight: "#FAF6F0",
+          correctLevel: window.QRCode.CorrectLevel.M,
+        });
+      } else {
+        ref.current.innerHTML = `<div style="color:#C0392B;font-size:0.8rem">二维码加载失败，请刷新重试</div>`;
+      }
+    });
   }, [shopId]);
 
   return (
@@ -100,14 +115,13 @@ function QRDisplay({ shopId }) {
 // ── CUSTOMER MENU VIEW ───────────────────────────────────
 function MenuView({ menu, lang, setLang }) {
   const [activeCat, setActiveCat] = useState("sets");
-
   const filtered = menu.filter(i => i.category === activeCat);
 
   return (
     <div style={{ minHeight: "100vh", background: "#FAF6F0", fontFamily: "'Noto Serif SC', serif" }}>
       {/* Header */}
       <div style={{
-         padding: "28px 20px 18px", textAlign: "center",
+        padding: "28px 20px 18px", textAlign: "center",
         background: "linear-gradient(160deg, #1a1008 60%, #2d1a0e)",
         position: "relative", overflow: "hidden"
       }}>
@@ -187,7 +201,6 @@ function MenuView({ menu, lang, setLang }) {
               boxShadow: "0 2px 10px rgba(0,0,0,0.07)",
               animation: `fadeUp 0.35s ease ${idx * 0.05}s both`
             }}>
-              {/* Image */}
               <div style={{
                 width: 90, minHeight: 90, flexShrink: 0, overflow: "hidden",
                 background: "#f0e8e0", display: "flex", alignItems: "center", justifyContent: "center"
@@ -197,7 +210,6 @@ function MenuView({ menu, lang, setLang }) {
                   : <span style={{ fontSize: "2rem" }}>🍣</span>
                 }
               </div>
-              {/* Info */}
               <div style={{ flex: 1, padding: "12px 12px 12px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                 <div>
                   <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "#1a1008", lineHeight: 1.3 }}>{info.name}</div>
@@ -240,7 +252,7 @@ function MenuView({ menu, lang, setLang }) {
 
 // ── ADMIN PANEL ──────────────────────────────────────────
 function AdminPanel({ menu, setMenu, shopId }) {
-  const [tab, setTab] = useState("menu"); // menu | qr
+  const [tab, setTab] = useState("menu");
   const [editItem, setEditItem] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
 
@@ -266,7 +278,6 @@ function AdminPanel({ menu, setMenu, shopId }) {
 
   return (
     <div style={{ minHeight: "100vh", background: "#f5f0eb", fontFamily: "'Noto Serif SC', serif" }}>
-      {/* Admin header */}
       <div style={{ background: "#1a1008", padding: "20px 20px 0" }}>
         <div style={{ fontFamily: "'Playfair Display', serif", color: "#C9A84C", fontSize: "1.4rem" }}>
           LoveSushi <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.8rem", fontFamily: "sans-serif" }}>后台管理</span>
@@ -286,7 +297,6 @@ function AdminPanel({ menu, setMenu, shopId }) {
       </div>
 
       <div style={{ padding: 16 }}>
-        {/* QR TAB */}
         {tab === "qr" && (
           <div style={{ background: "#fff", borderRadius: 16, padding: 24, textAlign: "center" }}>
             <div style={{ fontSize: "1rem", fontWeight: 600, marginBottom: 6 }}>你的专属二维码</div>
@@ -302,7 +312,6 @@ function AdminPanel({ menu, setMenu, shopId }) {
           </div>
         )}
 
-        {/* MENU TAB */}
         {tab === "menu" && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
@@ -365,7 +374,7 @@ function AdminPanel({ menu, setMenu, shopId }) {
           </div>
         )}
       </div>
-{/* Edit modal */}
+
       {editItem && <EditModal item={editItem} onSave={saveItem} onClose={() => { setEditItem(null); setShowAdd(false); }} />}
     </div>
   );
@@ -407,7 +416,6 @@ function EditModal({ item, onSave, onClose }) {
           <button onClick={onClose} style={{ background: "none", border: "none", fontSize: "1.4rem", cursor: "pointer", color: "#999" }}>✕</button>
         </div>
 
-        {/* Image upload */}
         <div style={{ marginBottom: 14 }}>
           <div style={{ fontSize: "0.78rem", color: "#888", marginBottom: 6 }}>菜品图片 / Immagine</div>
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
@@ -431,7 +439,6 @@ function EditModal({ item, onSave, onClose }) {
           </div>
         </div>
 
-        {/* Category */}
         <div style={{ marginBottom: 12 }}>
           <div style={{ fontSize: "0.78rem", color: "#888", marginBottom: 6 }}>分类 / Categoria</div>
           <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} style={inp()}>
@@ -439,7 +446,6 @@ function EditModal({ item, onSave, onClose }) {
           </select>
         </div>
 
-        {/* Chinese */}
         <div style={{ marginBottom: 12 }}>
           <div style={{ fontSize: "0.78rem", color: "#888", marginBottom: 6 }}>中文名称</div>
           <input style={inp({ marginBottom: 6 })} value={form.zh.name}
@@ -450,7 +456,6 @@ function EditModal({ item, onSave, onClose }) {
             placeholder="例：新鲜挪威三文鱼，入口即化" />
         </div>
 
-        {/* Italian */}
         <div style={{ marginBottom: 12 }}>
           <div style={{ fontSize: "0.78rem", color: "#888", marginBottom: 6 }}>Italiano</div>
           <input style={inp({ marginBottom: 6 })} value={form.it.name}
@@ -461,13 +466,12 @@ function EditModal({ item, onSave, onClose }) {
             placeholder="Es: Salmone norvegese fresco" />
         </div>
 
-        {/* Price */}
         <div style={{ marginBottom: 12 }}>
           <div style={{ fontSize: "0.78rem", color: "#888", marginBottom: 6 }}>价格 / Prezzo (€)</div>
           <input style={inp()} type="number" step="0.5" min="0" value={form.price}
             onChange={e => setForm(f => ({ ...f, price: parseFloat(e.target.value) || 0 }))} />
         </div>
-        {/* Badge */}
+
         <div style={{ marginBottom: 20 }}>
           <div style={{ fontSize: "0.78rem", color: "#888", marginBottom: 6 }}>标签 / Badge</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -498,26 +502,25 @@ function EditModal({ item, onSave, onClose }) {
 
 // ── ROOT APP ─────────────────────────────────────────────
 export default function App() {
-  const [view, setView] = useState("customer"); // customer | admin
+  const [view, setView] = useState("customer");
   const [lang, setLang] = useState("it");
+
   const [menu, setMenu] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORE_KEY);
-      return saved ? JSON.parse(saved) : DEFAULT_MENU;
-    } catch { return DEFAULT_MENU; }
+    const saved = safeGet(STORE_KEY);
+    try { return saved ? JSON.parse(saved) : DEFAULT_MENU; }
+    catch { return DEFAULT_MENU; }
   });
+
   const [shopId] = useState(() => {
-    let id = localStorage.getItem(SHOP_ID_KEY);
-    if (!id) { id = generateShopId(); localStorage.setItem(SHOP_ID_KEY, id); }
+    let id = safeGet(SHOP_ID_KEY);
+    if (!id) { id = generateShopId(); safeSet(SHOP_ID_KEY, id); }
     return id;
   });
 
-  // Persist menu
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(menu)); } catch {}
+    safeSet(STORE_KEY, JSON.stringify(menu));
   }, [menu]);
 
-  // Check URL for view=menu
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("view") === "menu") setView("customer");
@@ -526,9 +529,7 @@ export default function App() {
   return (
     <>
       <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet" />
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" />
 
-      {/* Mode switcher */}
       <div style={{
         position: "fixed", bottom: 16, left: "50%", transform: "translateX(-50%)",
         background: "#1a1008", borderRadius: 999, padding: "6px 8px",
