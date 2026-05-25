@@ -528,7 +528,8 @@ const [form, setForm] = useState(JSON.parse(JSON.stringify(item)));
         }}>{saving ? "保存中..." : "保存 / Salva"}</button>
       </div>
     </div>
-  );// ── ROOT APP ─────────────────────────────────────────────
+  );}
+// ── ROOT APP ─────────────────────────────────────────────
 export default function App() {
   const [view, setView] = useState("customer");
   const [lang, setLang] = useState("it");
