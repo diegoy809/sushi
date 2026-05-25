@@ -178,10 +178,8 @@ function MenuView({ menu, lang, setLang, shopInfo, onLogoTap }) {
                   <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", color: isSoldout ? "#bbb" : "#C0392B", fontWeight: 700 }}>
                     €{item.price.toFixed(2)}
                   </div>
-                  <div style={{ display: "flex", gap: 6 }}>
+                            <div style={{ display: "flex", gap: 6 }}>
                     {isSoldout && <div style={{ fontSize: "0.65rem", padding: "3px 8px", borderRadius: 999, background: "#fff3e0", color: "#e65100", fontWeight: 600 }}>{lang === "zh" ? "售罄" : "Esaurito"}</div>}
-                    {badgeLabel && badgeIdx > 0 && !isSoldout && (
-                      <div style={{ fontSize: "0.65rem", padding: "3px 8px", borderRadius: 999, background: "#fff3e0", color: "#e65100", fontWeight: 600 }}>{lang === "zh" ? "售罄" : "Esaurito"}</div>}
                     {badgeLabel && badgeIdx > 0 && !isSoldout && (
                       <div style={{ fontSize: "0.65rem", padding: "3px 8px", borderRadius: 999, background: item.badge === "novità" ? "#fff8e1" : "#f8eaea", color: item.badge === "novità" ? "#b8860b" : "#C0392B" }}>{badgeLabel}</div>
                     )}
@@ -189,6 +187,7 @@ function MenuView({ menu, lang, setLang, shopInfo, onLogoTap }) {
                 </div>
               </div>
             </div>
+
           );
         })}
 
