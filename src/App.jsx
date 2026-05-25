@@ -29,7 +29,9 @@ const DEFAULT_SHOP_INFO = {
 const CATEGORIES = [
   { id: "sets", zh: "套餐", it: "Menu" },
   { id: "nigiri", zh: "握寿司", it: "Nigiri" },
+  { id: "sashimi", zh: "刺身", it: "Sashimi" },
   { id: "rolls", zh: "卷物", it: "Roll" },
+  { id: "chinese", zh: "中餐", it: "Cinese" },
   { id: "drinks", zh: "饮品", it: "Bevande" },
 ];
 
