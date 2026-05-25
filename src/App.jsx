@@ -107,7 +107,7 @@ function MenuView({ menu, lang, setLang }) {
     <div style={{ minHeight: "100vh", background: "#FAF6F0", fontFamily: "'Noto Serif SC', serif" }}>
       {/* Header */}
       <div style={{
-        background: "#1a1008", padding: "28px 20px 18px", textAlign: "center",
+         padding: "28px 20px 18px", textAlign: "center",
         background: "linear-gradient(160deg, #1a1008 60%, #2d1a0e)",
         position: "relative", overflow: "hidden"
       }}>
@@ -125,7 +125,7 @@ function MenuView({ menu, lang, setLang }) {
         </div>
       </div>
 
-      /* Lang toggle */}
+      {/* Lang toggle */}
       <div style={{ background: "#C0392B", display: "flex", justifyContent: "center" }}>
         {["zh", "it"].map(l => (
           <button key={l} onClick={() => setLang(l)} style={{
