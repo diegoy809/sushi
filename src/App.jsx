@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { db } from "./firebase";
+import { getAuth, signInAnonymously } from "firebase/auth";
 import {
   collection, doc, setDoc, deleteDoc,
   onSnapshot, getDocs, getDoc
@@ -636,17 +637,19 @@ const [loading, setLoading] = useState(true);
       setPinError(false);
     }
   }
-function handlePinSubmit() {
-    if (pinInput === SECRET_PIN) {
-      setAdminUnlocked(true);
-      setShowPin(false);
-      setView("admin");
-    } else {
-      setPinError(true);
-      setPinInput("");
-      setTimeout(() => setPinError(false), 1500);
-    }
+async function handlePinSubmit() {
+  if (pinInput === SECRET_PIN) {
+    const auth = getAuth();
+    await signInAnonymously(auth);
+    setAdminUnlocked(true);
+    setShowPin(false);
+    setView("admin");
+  } else {
+    setPinError(true);
+    setPinInput("");
+    setTimeout(() => setPinError(false), 1500);
   }
+}
 
   function handleAdminExit() {
     setAdminUnlocked(false);
